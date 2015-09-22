@@ -24,14 +24,16 @@ _kiwi.view.UserBox = Backbone.View.extend({
             info: _kiwi.global.i18n.translate('client_views_userbox_whois').fetch(),
             ignore: _kiwi.global.i18n.translate('client_views_userbox_ignore').fetch()
         };
-        this.$el = $(_.template($('#tmpl_userbox').html().trim(), text));
+        this.$el = $(_.template($('#tmpl_userbox').html().trim())(text));
     },
 
     setTargets: function (user, channel) {
         this.user = user;
         this.channel = channel;
 
-        var is_ignored = _kiwi.app.connections.active_connection.isNickIgnored(this.user.get('nick'));
+        var user_mask = toUserMask(this.user.get('nick')),
+            is_ignored = _kiwi.app.connections.active_connection.isUserIgnored(user_mask);
+
         this.$('.ignore input').attr('checked', is_ignored ? 'checked' : false);
     },
 

@@ -58,6 +58,11 @@ if (process.argv.indexOf('-f') === -1 && global.config && global.config.log) {
 }
 
 
+// Extra debugging output if the -v flag is given
+if (process.argv.indexOf('-v') > -1) {
+    winston.level = 'debug';
+}
+
 
 // Make sure we have a valid config file and at least 1 server
 if (!global.config || Object.keys(global.config).length === 0) {
@@ -103,17 +108,17 @@ global.clients = {
     port_pairs: {},
 
     add: function (client) {
-        this.clients[client.hash] = client;
+        this.clients[client.id] = client;
         if (typeof this.addresses[client.real_address] === 'undefined') {
             this.addresses[client.real_address] = Object.create(null);
         }
-        this.addresses[client.real_address][client.hash] = client;
+        this.addresses[client.real_address][client.id] = client;
     },
 
     remove: function (client) {
-        if (typeof this.clients[client.hash] !== 'undefined') {
-            delete this.clients[client.hash];
-            delete this.addresses[client.real_address][client.hash];
+        if (typeof this.clients[client.id] !== 'undefined') {
+            delete this.clients[client.id];
+            delete this.addresses[client.real_address][client.id];
             if (Object.keys(this.addresses[client.real_address]).length < 1) {
                 delete this.addresses[client.real_address];
             }

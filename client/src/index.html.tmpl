@@ -53,6 +53,13 @@
             </div>
 
             <div class="controlbox">
+                <div class="autocomplete">
+                    <div class="autocomplete-header">
+                        <span class="autocomplete-header-label">People or channels</span>
+                        <span class="autocomplete-header-help">
+                            <strong>tab</strong>&nbsp; or &nbsp;<strong>↑</strong> <strong>↓</strong>&nbsp; to navigate <strong class="left_margin">↵</strong>&nbsp; to select <strong class="left_margin">esc</strong>&nbsp; to dismiss</span>
+                    </div>
+                </div>
                 <div class="input">
                     <span class="nick"> </span>
                     <div class="input_wrap"><textarea class="inp"></textarea></div>
@@ -242,38 +249,57 @@
 
     <script type="text/html" id="tmpl_applet_settings">
         <div class="settings_container">
-            <form>
+            <div class="settings-category-list">
+                <a class="show-category show-category-appearance" data-category="appearance"><%= appearance %></a>
+                <a class="show-category show-category-messages" data-category="messages"><%= messages %></a>
+            </div>
+
+            <form class="settings-category settings-category-messages">
+                <h5><%= messages %></h5>
                 <section>
-                    <h6>Theme</h6>
+                    <h6><%= chat_messages %></h6>
                     <div class="control-group">
-                        <div class="thumbnails">
-                            <% _.forEach(theme_thumbnails, function(thumbnail) { %>
-                                <%= thumbnail %>
-                            <% }); %>
+                        <div class="checkbox">
+                            <label>
+                                <input data-setting="show_timestamps" type="checkbox">
+                                <%= timestamps %>
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input data-setting="use_24_hour_timestamps" type="checkbox">
+                                <%= timestamp_24 %>
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input data-setting="show_emoticons" type="checkbox">
+                                <%= emoticons %>
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input data-setting="ignore_new_queries" type="checkbox">
+                                <%= queries %>
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input data-setting="show_autocomplete_slideout" type="checkbox">
+                                <%= autocomplete_slideout %>
+                            </label>
+                        </div>
+                        <div>
+                            <label>
+                                <input data-setting="scrollback" class="input-small" type="text" size="4" pattern="\d*">
+                                <span><%= scroll_history %></span>
+                            </label>
                         </div>
                     </div>
                 </section>
 
                 <section>
-                    <h6>Channels</h6>
-                    <div class="control-group">
-                        <div class="radio">
-                            <label>
-                                <input type="radio" name="channel_list_style" data-setting="channel_list_style" value="tabs">
-                                <%= tabs %>
-                            </label>
-                        </div>
-                        <div class="radio">
-                            <label>
-                                <input type="radio" name="channel_list_style" data-setting="channel_list_style" value="list">
-                                <%= list %><small class="text-muted">(<%= large_amounts_of_chans %>)</small>
-                            </label>
-                        </div>
-                    </div>
-                </section>
-
-                <section>
-                    <h6>Chat window</h6>
+                    <h6><%= alerts_notifications %></h6>
                     <div class="control-group">
                         <div class="checkbox">
                             <label>
@@ -289,32 +315,8 @@
                         </div>
                         <div class="checkbox">
                             <label>
-                                <input data-setting="show_timestamps" type="checkbox">
-                                <%= timestamps %>
-                            </label>
-                        </div>
-                        <div class="checkbox">
-                            <label>
-                                <input data-setting="use_24_hour_timestamps" type="checkbox">
-                                <%= timestamp_24 %>
-                            </label>
-                        </div>
-                        <div class="checkbox">
-                            <label>
                                 <input data-setting="mute_sounds" type="checkbox">
                                 <%= mute %>
-                            </label>
-                        </div>
-                        <div class="checkbox">
-                            <label>
-                                <input data-setting="show_emoticons" type="checkbox">
-                                <%= emoticons %>
-                            </label>
-                        </div>
-                        <div>
-                            <label>
-                                <input data-setting="scrollback" class="input-small" type="text" size="4" pattern="\d*">
-                                <span><%= scroll_history %></span>
                             </label>
                         </div>
                         <div>
@@ -325,9 +327,45 @@
                         </div>
                     </div>
                 </section>
+            </form>
+
+            <form class="settings-category settings-category-appearance">
+                <h5><%= appearance %></h5>
+                <section>
+                    <h6><%= theme %></h6>
+                    <div class="control-group">
+                        <div class="thumbnails">
+                            <% _.forEach(theme_thumbnails, function(thumbnail) { %>
+                                <%= thumbnail %>
+                            <% }); %>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h6><%= channels %></h6>
+                    <div class="control-group">
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="channel_list_style" data-setting="channel_list_style" value="tabs">
+                                <%= tabs %>
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="channel_list_style" data-setting="channel_list_style" value="list">
+                                <%= list %><small class="text-muted">(<%= large_amounts_of_chans %>)</small>
+                            </label>
+                        </div>
+                        <label>
+                            <input data-setting="scrollback" class="input-small" type="text" size="4" pattern="\d*">
+                            <span><%= scroll_history %></span>
+                        </label>
+                    </div>
+                </section>
 
                 <section class="language">
-                    <h6>Language</h6>
+                    <h6><%= language %></h6>
                     <div class="control-group">
                         <select data-setting="locale">
                             <option value=""></li>

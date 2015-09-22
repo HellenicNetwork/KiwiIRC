@@ -183,7 +183,7 @@ _kiwi.view.Application = Backbone.View.extend({
         }
 
         // Determine if we have a narrow window (mobile/tablet/or even small desktop window)
-        if ($kiwi.outerWidth() < 420) {
+        if ($kiwi.outerWidth() < 700) {
             $kiwi.addClass('narrow');
             if (this.model.rightbar && this.model.rightbar.keep_hidden !== true)
                 this.model.rightbar.toggle(true);
@@ -320,7 +320,7 @@ _kiwi.view.Application = Backbone.View.extend({
             soundManager.setup({
                 url: base_path + '/assets/libs/soundmanager2/',
                 flashVersion: 9, // optional: shiny features (default = 8)// optional: ignore Flash where possible, use 100% HTML5 mode
-                preferFlash: true,
+                preferFlash: false,
 
                 onready: function() {
                     that.sound_object = soundManager.createSound({

@@ -2,6 +2,7 @@ var util             = require('util'),
     events           = require('events'),
     crypto           = require('crypto'),
     _                = require('lodash'),
+    winston          = require('winston'),
     State            = require('./irc/state.js'),
     IrcConnection    = require('./irc/connection.js').IrcConnection,
     ClientCommands   = require('./clientcommands.js'),
@@ -9,9 +10,18 @@ var util             = require('util'),
     Stats            = require('./stats.js');
 
 
+var next_client_id = 1;
+function generateClientId() {
+    return next_client_id++;
+}
+
 var Client = function (websocket, opts) {
     var that = this;
 
+    // An ID to identify this client instance
+    this.id = generateClientId();
+
+    winston.debug('(client ' + this.id + ') Connected');
     Stats.incr('client.created');
 
     events.EventEmitter.call(this);
@@ -30,13 +40,6 @@ var Client = function (websocket, opts) {
 
     // Clients address
     this.real_address = this.websocket.meta.real_address;
-
-    // A hash to identify this client instance
-    this.hash = crypto.createHash('sha256')
-        .update(this.real_address)
-        .update('' + Date.now())
-        .update(Math.floor(Math.random() * 100000).toString())
-        .digest('hex');
 
     this.state = new State(this);
 
@@ -93,6 +96,7 @@ Client.prototype.sendKiwiCommand = function (command, data, callback) {
 };
 
 Client.prototype.dispose = function () {
+    winston.debug('(client ' + this.id + ') Disposing');
     Stats.incr('client.disposed');
 
     if (this._heartbeat_tmr) {
@@ -121,8 +125,10 @@ Client.prototype.heartbeat = function() {
 
 
 Client.prototype._heartbeat_timeout = function() {
+    winston.debug('(client ' + this.id + ') Timeout');
+
     Stats.incr('client.timeout');
-    this.websocketDisconnect();
+    websocketDisconnect.apply(this);
 };
 
 
@@ -174,8 +180,9 @@ Client.prototype.attachKiwiCommands = function() {
 
 // Websocket has disconnected, so quit all the IRC connections
 function websocketDisconnect() {
-    this.emit('disconnect');
+    winston.debug('(client ' + this.id + ') Disconnected');
 
+    this.emit('disconnect');
     this.dispose();
 }
 

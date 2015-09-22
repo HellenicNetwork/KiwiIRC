@@ -5,7 +5,7 @@
         this.controlbox = controlbox;
 
         this.addDefaultAliases();
-        this.bindCommand(fn_to_bind);
+        this.bindCommand(buildCommandFunctions());
     }
 
     _kiwi.misc.ClientUiCommands = ClientUiCommands;
@@ -46,11 +46,22 @@
      * @var command Object {'command:the_command': fn}
      */
     ClientUiCommands.prototype.bindCommand = function(command) {
-        var that = this;
+        var that = this,
+            descriptions = {};
 
         _.each(command, function(fn, event_name) {
-            that.controlbox.on(event_name, _.bind(fn, that));
+            var command_fn;
+            if (typeof fn === 'function') {
+                command_fn = fn;
+            } else {
+                command_fn = fn.fn;
+                descriptions['/' + event_name.split(':')[1]] = fn.description;
+            }
+
+            that.controlbox.on(event_name, _.bind(command_fn, that));
         });
+
+        this.controlbox.setAutoCompleteCommands(descriptions);
     };
 
 
@@ -60,161 +71,191 @@
      * Default functions to bind to controlbox events
      **/
 
-    var fn_to_bind = {
-        'unknown_command':     unknownCommand,
-        'command':             allCommands,
-        'command:msg':         msgCommand,
-        'command:action':      actionCommand,
-        'command:join':        joinCommand,
-        'command:part':        partCommand,
-        'command:cycle':        cycleCommand,
-        'command:nick':        nickCommand,
-        'command:query':       queryCommand,
-        'command:invite':      inviteCommand,
-        'command:topic':       topicCommand,
-        'command:notice':      noticeCommand,
-        'command:quote':       quoteCommand,
-        'command:kick':        kickCommand,
-        'command:clear':       clearCommand,
-        'command:ctcp':        ctcpCommand,
-        'command:quit':        quitCommand,
-        'command:server':      serverCommand,
-        'command:whois':       whoisCommand,
-        'command:whowas':      whowasCommand,
-        'command:away':        awayCommand,
-        'command:encoding':    encodingCommand,
-        'command:channel':     channelCommand,
-        'command:applet':      appletCommand,
-        'command:settings':    settingsCommand,
-        'command:script':      scriptCommand
-    };
+    function buildCommandFunctions() {
+        var fn_to_bind = {
+            'unknown_command':     unknownCommand,
+            'command':             allCommands,
+            'command:msg':         {fn: msgCommand, description: translateText('command_description_msg')},
+            'command:action':      {fn: actionCommand, description: translateText('command_description_action')},
+            'command:join':        {fn: joinCommand, description: translateText('command_description_join')},
+            'command:part':        {fn: partCommand, description: translateText('command_description_part')},
+            'command:cycle':       {fn: cycleCommand, description: translateText('command_description_cycle')},
+            'command:nick':        {fn: nickCommand, description: translateText('command_description_nick')},
+            'command:query':       {fn: queryCommand, description: translateText('command_description_query')},
+            'command:invite':      {fn: inviteCommand, description: translateText('command_description_invite')},
+            'command:topic':       {fn: topicCommand, description: translateText('command_description_topic')},
+            'command:notice':      {fn: noticeCommand, description: translateText('command_description_notice')},
+            'command:quote':       {fn: quoteCommand, description: translateText('command_description_quote')},
+            'command:kick':        {fn: kickCommand, description: translateText('command_description_kick')},
+            'command:names':       {fn: namesCommand, description: ''},
+            'command:clear':       {fn: clearCommand, description: translateText('command_description_clear')},
+            'command:ctcp':        {fn: ctcpCommand, description: translateText('command_description_ctcp')},
+            'command:quit':        {fn: quitCommand, description: translateText('command_description_quit')},
+            'command:server':      {fn: serverCommand, description: translateText('command_description_server')},
+            'command:whois':       {fn: whoisCommand, description: translateText('command_description_whois')},
+            'command:whowas':      {fn: whowasCommand, description: translateText('command_description_whowas')},
+            'command:away':        {fn: awayCommand, description: translateText('command_description_away')},
+            'command:encoding':    {fn: encodingCommand, description: translateText('command_description_encoding')},
+            'command:channel':     {fn: channelCommand, description: ''},
+            'command:applet':      {fn: appletCommand, description: ''},
+            'command:settings':    {fn: settingsCommand, description: translateText('command_description_settings')},
+            'command:script':      {fn: scriptCommand, description: translateText('command_description_script')}
+        };
 
 
-    fn_to_bind['command:css'] = function (ev) {
-        var queryString = '?reload=' + new Date().getTime();
-        $('link[rel="stylesheet"]').each(function () {
-            this.href = this.href.replace(/\?.*|$/, queryString);
-        });
-    };
-
-
-    fn_to_bind['command:js'] = function (ev) {
-        if (!ev.params[0]) return;
-        $script(ev.params[0] + '?' + (new Date().getTime()));
-    };
-
-
-    fn_to_bind['command:set'] = function (ev) {
-        if (!ev.params[0]) return;
-
-        var setting = ev.params[0],
-            value;
-
-        // Do we have a second param to set a value?
-        if (ev.params[1]) {
-            ev.params.shift();
-
-            value = ev.params.join(' ');
-
-            // If we're setting a true boolean value..
-            if (value === 'true')
-                value = true;
-
-            // If we're setting a false boolean value..
-            if (value === 'false')
-                value = false;
-
-            // If we're setting a number..
-            if (parseInt(value, 10).toString() === value)
-                value = parseInt(value, 10);
-
-            _kiwi.global.settings.set(setting, value);
-        }
-
-        // Read the value to the user
-        this.app.panels().active.addMsg('', styleText('set_setting', {text: setting + ' = ' + _kiwi.global.settings.get(setting).toString()}));
-    };
-
-
-    fn_to_bind['command:save'] = function (ev) {
-        _kiwi.global.settings.save();
-        this.app.panels().active.addMsg('', styleText('settings_saved', {text: translateText('client_models_application_settings_saved')}));
-    };
-
-
-    fn_to_bind['command:alias'] = function (ev) {
-        var that = this,
-            name, rule;
-
-        // No parameters passed so list them
-        if (!ev.params[1]) {
-            $.each(this.controlbox.preprocessor.aliases, function (name, rule) {
-                that.app.panels().server.addMsg(' ', styleText('list_aliases', {text: name + '   =>   ' + rule}));
-            });
-            return;
-        }
-
-        // Deleting an alias?
-        if (ev.params[0] === 'del' || ev.params[0] === 'delete') {
-            name = ev.params[1];
-            if (name[0] !== '/') name = '/' + name;
-            delete this.controlbox.preprocessor.aliases[name];
-            return;
-        }
-
-        // Add the alias
-        name = ev.params[0];
-        ev.params.shift();
-        rule = ev.params.join(' ');
-
-        // Make sure the name starts with a slash
-        if (name[0] !== '/') name = '/' + name;
-
-        // Now actually add the alias
-        this.controlbox.preprocessor.aliases[name] = rule;
-    };
-
-
-    fn_to_bind['command:ignore'] = function (ev) {
-        var that = this,
-            list = this.app.connections.active_connection.get('ignore_list');
-
-        // No parameters passed so list them
-        if (!ev.params[0]) {
-            if (list.length > 0) {
-                this.app.panels().active.addMsg(' ', styleText('ignore_title', {text: translateText('client_models_application_ignore_title')}));
-                $.each(list, function (idx, ignored_pattern) {
-                    that.app.panels().active.addMsg(' ', styleText('ignored_pattern', {text: ignored_pattern}));
+        fn_to_bind['command:css'] = {
+            description: translateText('command_description_css'),
+            fn: function(ev) {
+                var queryString = '?reload=' + new Date().getTime();
+                $('link[rel="stylesheet"]').each(function () {
+                    this.href = this.href.replace(/\?.*|$/, queryString);
                 });
-            } else {
-                this.app.panels().active.addMsg(' ', styleText('ignore_none', {text: translateText('client_models_application_ignore_none')}));
             }
-            return;
-        }
-
-        // We have a parameter, so add it
-        list.push(ev.params[0]);
-        this.app.connections.active_connection.set('ignore_list', list);
-        this.app.panels().active.addMsg(' ', styleText('ignore_nick', {text: translateText('client_models_application_ignore_nick', [ev.params[0]])}));
-    };
+        };
 
 
-    fn_to_bind['command:unignore'] = function (ev) {
-        var list = this.app.connections.active_connection.get('ignore_list');
+        fn_to_bind['command:js'] = {
+            description: translateText('command_description_js'),
+            fn: function(ev) {
+                if (!ev.params[0]) return;
+                $script(ev.params[0] + '?' + (new Date().getTime()));
+            }
+        };
 
-        if (!ev.params[0]) {
-            this.app.panels().active.addMsg(' ', styleText('ignore_stop_notice', {text: translateText('client_models_application_ignore_stop_notice')}));
-            return;
-        }
 
-        list = _.reject(list, function(pattern) {
-            return pattern === ev.params[0];
-        });
+        fn_to_bind['command:set'] = {
+            description: translateText('command_description_set'),
+            fn: function(ev) {
+                if (!ev.params[0]) return;
 
-        this.app.connections.active_connection.set('ignore_list', list);
+                var setting = ev.params[0],
+                    value;
 
-        this.app.panels().active.addMsg(' ', styleText('ignore_stopped', {text: translateText('client_models_application_ignore_stopped', [ev.params[0]])}));
-    };
+                // Do we have a second param to set a value?
+                if (ev.params[1]) {
+                    ev.params.shift();
+
+                    value = ev.params.join(' ');
+
+                    // If we're setting a true boolean value..
+                    if (value === 'true')
+                        value = true;
+
+                    // If we're setting a false boolean value..
+                    if (value === 'false')
+                        value = false;
+
+                    // If we're setting a number..
+                    if (parseInt(value, 10).toString() === value)
+                        value = parseInt(value, 10);
+
+                    _kiwi.global.settings.set(setting, value);
+                }
+
+                // Read the value to the user
+                this.app.panels().active.addMsg('', styleText('set_setting', {text: setting + ' = ' + _kiwi.global.settings.get(setting).toString()}));
+            }
+        };
+
+
+        fn_to_bind['command:save'] = {
+            description: translateText('command_description_save'),
+            fn: function(ev) {
+                _kiwi.global.settings.save();
+                this.app.panels().active.addMsg('', styleText('settings_saved', {text: translateText('client_models_application_settings_saved')}));
+            }
+        };
+
+
+        fn_to_bind['command:alias'] = {
+            description: translateText('command_description_alias'),
+            fn: function(ev) {
+                var that = this,
+                    name, rule;
+
+                // No parameters passed so list them
+                if (!ev.params[1]) {
+                    $.each(this.controlbox.preprocessor.aliases, function (name, rule) {
+                        that.app.panels().server.addMsg(' ', styleText('list_aliases', {text: name + '   =>   ' + rule}));
+                    });
+                    return;
+                }
+
+                // Deleting an alias?
+                if (ev.params[0] === 'del' || ev.params[0] === 'delete') {
+                    name = ev.params[1];
+                    if (name[0] !== '/') name = '/' + name;
+                    delete this.controlbox.preprocessor.aliases[name];
+                    return;
+                }
+
+                // Add the alias
+                name = ev.params[0];
+                ev.params.shift();
+                rule = ev.params.join(' ');
+
+                // Make sure the name starts with a slash
+                if (name[0] !== '/') name = '/' + name;
+
+                // Now actually add the alias
+                this.controlbox.preprocessor.aliases[name] = rule;
+            }
+        };
+
+
+        fn_to_bind['command:ignore'] = {
+            description: translateText('command_description_ignore'),
+            fn: function(ev) {
+                var that = this,
+                    ignore_list = this.app.connections.active_connection.ignore_list,
+                    user_mask;
+
+                // No parameters passed so list them
+                if (!ev.params[0]) {
+                    if (ignore_list.length > 0) {
+                        this.app.panels().active.addMsg(' ', styleText('ignore_title', {text: translateText('client_models_application_ignore_title')}));
+                        ignore_list.forEach(function(ignored) {
+                            that.app.panels().active.addMsg(' ', styleText('ignored_pattern', {text: ignored.get('mask')}));
+                        });
+                    } else {
+                        this.app.panels().active.addMsg(' ', styleText('ignore_none', {text: translateText('client_models_application_ignore_none')}));
+                    }
+                    return;
+                }
+
+                // We have a parameter, so add it, first convert it to a full mask.
+                user_mask = toUserMask(ev.params[0]);
+                ignore_list.addMask(user_mask);
+
+                this.app.panels().active.addMsg(' ', styleText('ignore_nick', {text: translateText('client_models_application_ignore_nick', [user_mask])}));
+            }
+        };
+
+
+        fn_to_bind['command:unignore'] = {
+            description: translateText('command_description_unignore'),
+            fn: function(ev) {
+                var ignore_list = this.app.connections.active_connection.ignore_list,
+                    user_mask, matches;
+
+                if (!ev.params[0]) {
+                    this.app.panels().active.addMsg(' ', styleText('ignore_stop_notice', {text: translateText('client_models_application_ignore_stop_notice')}));
+                    return;
+                }
+
+                user_mask = toUserMask(ev.params[0]);
+                matches = ignore_list.where({mask: user_mask});
+                if (matches) {
+                    ignore_list.remove(matches);
+                }
+
+                this.app.panels().active.addMsg(' ', styleText('ignore_stopped', {text: translateText('client_models_application_ignore_stopped', [user_mask])}));
+            }
+        };
+
+
+        return fn_to_bind;
+    }
 
 
 
@@ -252,7 +293,7 @@
         // Check if we have the panel already. If not, create it
         panel = this.app.connections.active_connection.panels.getByName(destination);
         if (!panel) {
-            panel = new _kiwi.model.Query({name: destination});
+            panel = new _kiwi.model.Query({name: destination, network: this.app.connections.active_connection});
             this.app.connections.active_connection.panels.add(panel);
         }
 
@@ -379,6 +420,20 @@
         ev.params.shift();
 
         this.app.connections.active_connection.gateway.kick(panel.get('name'), nick, ev.params.join(' '));
+    }
+
+
+    function namesCommand (ev) {
+        var channel, panel = this.app.panels().active;
+
+        if (!panel.isChannel()) return;
+
+        // Make sure we have a channel
+        channel = ev.params.length === 0 ?
+            panel.get('name') :
+            ev.params[0];
+
+        this.app.connections.active_connection.gateway.raw('NAMES ' + channel);
     }
 
 

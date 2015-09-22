@@ -4,20 +4,29 @@
             'change [data-setting]': 'saveSettings',
             'click [data-setting="theme"]': 'selectTheme',
             'click .register_protocol': 'registerProtocol',
-            'click .enable_notifications': 'enableNotifications'
+            'click .enable_notifications': 'enableNotifications',
+            'click .show-category': 'onClickShowCategory'
         },
 
         initialize: function (options) {
             var text = {
+                messages              : translateText('client_applets_settings_messages'),
+                chat_messages         : translateText('client_applets_settings_chat_messages'),
+                alerts_notifications  : translateText('client_applets_settings_alerts_notifications'),
+                appearance            : translateText('client_applets_settings_appearance'),
+                theme                 : translateText('client_applets_settings_theme'),
+                channels              : translateText('client_applets_settings_channels'),
                 tabs                  : translateText('client_applets_settings_channelview_tabs'),
                 list                  : translateText('client_applets_settings_channelview_list'),
                 large_amounts_of_chans: translateText('client_applets_settings_channelview_list_notice'),
+                language              : translateText('client_applets_settings_language'),
                 join_part             : translateText('client_applets_settings_notification_joinpart'),
                 count_all_activity    : translateText('client_applets_settings_notification_count_all_activity'),
                 timestamps            : translateText('client_applets_settings_timestamp'),
                 timestamp_24          : translateText('client_applets_settings_timestamp_24_hour'),
                 mute                  : translateText('client_applets_settings_notification_sound'),
                 emoticons             : translateText('client_applets_settings_emoticons'),
+                queries               : translateText('client_applets_settings_ignore_new_queries'),
                 scroll_history        : translateText('client_applets_settings_history_length'),
                 languages             : _kiwi.app.translations,
                 default_client        : translateText('client_applets_settings_default_client'),
@@ -27,11 +36,12 @@
                 html5_notifications   : translateText('client_applets_settings_html5_notifications'),
                 enable_notifications  : translateText('client_applets_settings_enable_notifications'),
                 custom_highlights     : translateText('client_applets_settings_custom_highlights'),
+                autocomplete_slideout : translateText('client_applets_settings_autocomplete_slideout'),
                 theme_thumbnails: _.map(_kiwi.app.themes, function (theme) {
-                    return _.template($('#tmpl_theme_thumbnail').html().trim(), theme);
+                    return _.template($('#tmpl_theme_thumbnail').html().trim())(theme);
                 })
             };
-            this.$el = $(_.template($('#tmpl_applet_settings').html().trim(), text));
+            this.$el = $(_.template($('#tmpl_applet_settings').html().trim())(text));
 
             if (!navigator.registerProtocolHandler) {
                 this.$('.protocol_handler').remove();
@@ -44,8 +54,8 @@
             // Incase any settings change while we have this open, update them
             _kiwi.global.settings.on('change', this.loadSettings, this);
 
-            // Now actually show the current settings
-            this.loadSettings();
+            // Now actually show the first cetegory of settings
+            this.showCategory('appearance');
 
         },
 
@@ -100,13 +110,8 @@
                     break;
             }
 
-            // Stop settings being updated while we're saving one by one
-            _kiwi.global.settings.off('change', this.loadSettings, this);
             settings.set($setting.data('setting'), value);
-            settings.save();
-
-            // Continue listening for setting changes
-            _kiwi.global.settings.on('change', this.loadSettings, this);
+            settings.saveOne($setting.data('setting'));
         },
 
         selectTheme: function(event) {
@@ -132,6 +137,26 @@
                     this.$('.notification_enabler').remove();
                 }
             }, this));
+        },
+
+
+        showCategory: function(category) {
+            this.$('.settings-category').removeClass('active');
+            this.$('.settings-category-' + category).addClass('active');
+
+            this.$('.show-category').removeClass('active');
+            this.$('.show-category-' + category).addClass('active');
+
+            // Load the current settings
+            this.loadSettings();
+        },
+
+
+        onClickShowCategory: function(event) {
+            var category = $(event.currentTarget).data('category');
+            if (category) {
+                this.showCategory(category);
+            }
         }
 
     });

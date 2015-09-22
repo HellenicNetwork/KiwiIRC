@@ -126,7 +126,7 @@ msgstr "Ustawienia zostały zapisane."
 
 #: 
 msgid "client_models_application_ignore_title"
-msgstr "Ksywki ignorowane"
+msgstr "Ignorowane pseudonimy"
 
 #: 
 msgid "client_models_application_ignore_none"
@@ -138,7 +138,7 @@ msgstr "Ignorujesz %s"
 
 #: 
 msgid "client_models_application_ignore_stop_notice"
-msgstr "Podaj ksywkę którą chcesz przestać ignorować"
+msgstr "Podaj pseudonim, który chcesz przestać ignorować"
 
 #: 
 msgid "client_models_application_ignore_stopped"
@@ -262,7 +262,7 @@ msgstr "jest pełny."
 
 #: 
 msgid "client_models_network_nickname_alreadyinuse"
-msgstr "Ta ksywka \"%s\" jest już w użyciu. Proszę wybrać nową ksywkę."
+msgstr "Pseudonim „%s” jest już w użyciu. Proszę wybrać nowy."
 
 #: 
 msgid "client_models_network_badpassword"
@@ -306,7 +306,7 @@ msgstr "Ładowanie gist"
 
 #: client/assets/src/views/nickchangegbox.js
 msgid "client_views_nickchangebox_new"
-msgstr "Nowa ksywka"
+msgstr "Nowy pseudonim"
 
 #: 
 msgid "client_views_nickchangebox_change"
@@ -322,11 +322,11 @@ msgstr "Ludziska rozmawiają!"
 
 #: client/assets/src/views/serverselect.js
 msgid "client_views_serverselect_form_title"
-msgstr "Wymyśl sobie ksywke..."
+msgstr "Wymyśl sobie pseudonim..."
 
 #: 
 msgid "client_views_serverselect_nickname"
-msgstr "Ksywka"
+msgstr "Pseudonim"
 
 #: 
 msgid "client_views_serverselect_enable_password"
@@ -374,7 +374,7 @@ msgstr "Powered by Kiwi IRC"
 
 #: 
 msgid "client_views_serverselect_nickname_error_empty"
-msgstr "Wybierz najpierw ksywkę!"
+msgstr "Wybierz najpierw pseudonim!"
 
 #: 
 msgid "client_views_serverselect_connection_successfully"
@@ -386,11 +386,11 @@ msgstr "Łączenie.."
 
 #: 
 msgid "client_views_serverselect_nickname_error_alreadyinuse"
-msgstr "Ksywka już zajęta"
+msgstr "Ten pseudonim jest już zajęty"
 
 #: 
 msgid "client_views_serverselect_nickname_invalid"
-msgstr "Błędna ksywka"
+msgstr "Błędny pseudonim"
 
 #: 
 msgid "client_views_serverselect_password_incorrect"
@@ -715,5 +715,161 @@ msgstr "Wyślij wiadomość..."
 
 #: 
 msgid "disconnect_from_server"
-msgstr "This will disconnect from the IRC network. Are you sure?"
+msgstr "Uczynienie tego spowoduje, że zostaniesz odłączony od sieci IRC. Jesteś tego pewien?"
+
+#: 
+msgid "client_applets_settings_custom_highlights"
+msgstr "Custom highlights (space separated)"
+
+#: client/assets/src/applets/settings.js
+msgid "client_applets_settings_messages"
+msgstr "Messages"
+
+#: client/assets/src/applets/settings.js
+msgid "client_applets_settings_chat_messages"
+msgstr "Chat messages"
+
+#: client/assets/src/applets/settings.js
+msgid "client_applets_settings_alerts_notifications"
+msgstr "Alerts / Notifications"
+
+#: client/assets/src/applets/settings.js
+msgid "client_applets_settings_appearance"
+msgstr "Appearance"
+
+#: client/assets/src/applets/settings.js
+msgid "client_applets_settings_theme"
+msgstr "Theme"
+
+#: client/assets/src/applets/settings.js
+msgid "client_applets_settings_channels"
+msgstr "Channels"
+
+#: 
+msgid "client_applets_settings_language"
+msgstr "Language"
+
+#: 
+msgid "client_applets_settings_ignore_new_queries"
+msgstr "Block new private messages"
+
+#: 
+msgid "command_description_msg"
+msgstr "Send a message"
+
+#: 
+msgid "command_description_action"
+msgstr "Do something physical"
+
+#: 
+msgid "command_description_join"
+msgstr "Join a channel"
+
+#: 
+msgid "command_description_part"
+msgstr "Leave a channel"
+
+#: 
+msgid "command_description_cycle"
+msgstr "Leave, then re-join a channel"
+
+#: 
+msgid "command_description_nick"
+msgstr "Change your nickname"
+
+#: 
+msgid "command_description_query"
+msgstr "Start a private message with someone"
+
+#: 
+msgid "command_description_invite"
+msgstr "Invite somebody into the channel"
+
+#: 
+msgid "command_description_topic"
+msgstr "Set the topic for this channel"
+
+#: 
+msgid "command_description_notice"
+msgstr "Send a notice"
+
+#: 
+msgid "command_description_quote"
+msgstr "Send a raw command to the IRC server"
+
+#: 
+msgid "command_description_kick"
+msgstr "Kick sombody from the channel"
+
+#: 
+msgid "command_description_clear"
+msgstr "Clear all messages from this window"
+
+#: 
+msgid "command_description_ctcp"
+msgstr "Send a CTCP command to somebody"
+
+#: 
+msgid "command_description_quit"
+msgstr "Disconnect from the IRC server"
+
+#: 
+msgid "command_description_server"
+msgstr "Connect to a new IRC network"
+
+#: 
+msgid "command_description_whois"
+msgstr "Request information on somebody"
+
+#: 
+msgid "command_description_whowas"
+msgstr "Request information on somebody that disconnected recently"
+
+#: 
+msgid "command_description_away"
+msgstr "Mark yourself as away"
+
+#: 
+msgid "command_description_encoding"
+msgstr "Change your connection encoding"
+
+#: 
+msgid "command_description_settings"
+msgstr "Show the settings window"
+
+#: 
+msgid "command_description_script"
+msgstr "Modify kiwi user scripts"
+
+#: 
+msgid "command_description_css"
+msgstr "Reload the page stylesheets"
+
+#: 
+msgid "command_description_js"
+msgstr "Load a javascript file from a URL"
+
+#: 
+msgid "command_description_set"
+msgstr "Set a kiwi config setting"
+
+#: 
+msgid "command_description_save"
+msgstr "Save the current kiwi settings"
+
+#: 
+msgid "command_description_alias"
+msgstr "Create an alias to an existing /command"
+
+#: 
+msgid "command_description_ignore"
+msgstr "Ignore messages from somebody"
+
+#: 
+msgid "command_description_unignore"
+msgstr "Stop ignoring somebody"
+
+#: 
+msgid "client_applets_settings_autocomplete_slideout"
+msgstr "Show the autocomplete slideout"
 
